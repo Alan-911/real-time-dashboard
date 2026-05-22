@@ -1,5 +1,9 @@
 # Real-Time Operations Dashboard
 
+**[🚀 Live Demo →](https://real-time-dashboard-blush.vercel.app)**
+
+[![Live Demo](https://img.shields.io/badge/Demo-Live-22c55e.svg)](https://real-time-dashboard-blush.vercel.app)
+
 > A live task board where database changes appear on screen instantly — no polling, no refresh. Built with Next.js 16, Supabase Realtime, and TypeScript.
 
 [![Next.js](https://img.shields.io/badge/Next.js-16-black.svg)](https://nextjs.org)
