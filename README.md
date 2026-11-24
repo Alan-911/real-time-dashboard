@@ -4,6 +4,12 @@
 
 [Live demonstration](https://real-time-dashboard-blush.vercel.app/) · [Application code](src/app/DashboardClient.tsx) · [Reporting](src/lib/reportService.ts)
 
+## Project preview
+
+![Realtime field operations architecture illustration](docs/images/project-overview.svg)
+
+*Illustrative architecture overview, not a capture of the deployed dashboard. [Open the live demo](https://real-time-dashboard-blush.vercel.app/) to view the actual interface.*
+
 ## Overview
 
 A full-stack dashboard prototype for managing and monitoring **field operations and assigned interventions**. It displays task priorities, assigned agents, status changes, execution logs and operational summaries.
