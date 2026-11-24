@@ -1,5 +1,7 @@
 # Real-Time Field Operations Command Center
 
+[![CI](https://github.com/Alan-911/real-time-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/Alan-911/real-time-dashboard/actions/workflows/ci.yml) [![Security](https://github.com/Alan-911/real-time-dashboard/actions/workflows/security.yml/badge.svg)](https://github.com/Alan-911/real-time-dashboard/actions/workflows/security.yml)
+
 **Next.js 16 · React 19 · TypeScript · Supabase Realtime · React Query**
 
 [Live demonstration](https://real-time-dashboard-blush.vercel.app/) · [Application code](src/app/DashboardClient.tsx) · [Reporting](src/lib/reportService.ts)
@@ -103,3 +105,11 @@ The realtime transport is implemented, but **no independently measured sub-50 ms
 **Working full-stack operations prototype** with database-backed realtime updates. Not a deployed emergency-response system or a verified high-availability production service.
 
 **Maintainer:** Yves Alain Iragena · [Portfolio](https://alan-911.github.io/my-portfolio/)
+
+
+## Repository quality and security
+
+- [Continuous integration](.github/workflows/ci.yml), [CodeQL and secret scanning](.github/workflows/security.yml).
+- [Security reporting policy](SECURITY.md) and [contribution guidelines](CONTRIBUTING.md).
+- Automated checks cannot replace Supabase RLS policies, authentication and deployment review; see [Supabase access-control checklist](docs/security/supabase-access.md).
+- Licensing for reuse should be confirmed with the project owner; no new license is granted by these workflow updates.
