@@ -35,3 +35,18 @@ jobs:
           scan-ref: .
           scanners: secret
           exit-code: "1"
+
+  dependency-audit:
+    name: npm dependency audit (high or critical)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install lockfile dependencies
+        run: npm ci
+      - name: Fail on known high or critical dependency advisories
+        run: npm audit --audit-level=high
