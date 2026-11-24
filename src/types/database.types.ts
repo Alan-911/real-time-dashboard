@@ -5,7 +5,7 @@ export type Todo = {
   priority: 'low' | 'medium' | 'high'
   assigned_agent: string | null
   updated_at: string
-  logs?: Array<{ message: string; timestamp: string; level?: string; [key: string]: any }> | null
+  logs?: Array<{ message: string; timestamp: string; level?: string; [key: string]: unknown }> | null
 }
 
 // ── NGO Metrics helpers ──────────────────────────────────────────────────────
