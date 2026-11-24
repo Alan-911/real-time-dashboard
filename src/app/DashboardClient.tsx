@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef , useSyncExternalStore } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Todo } from '@/types/database.types'
 import { estimateBeneficiaries, deploymentEfficiency } from '@/types/database.types'
@@ -116,13 +116,17 @@ import DashboardFooter from '@/components/DashboardFooter'
 import { Globe2, CheckCircle2, Clock, Zap, Users, Map } from 'lucide-react'
 
 /* ── Evaluator mode hook (reads ?view=evaluator without Suspense) ─────── */
+function subscribeToEvaluatorMode(onChange: () => void): () => void {
+  window.addEventListener('popstate', onChange)
+  return () => window.removeEventListener('popstate', onChange)
+}
+
 function useEvaluatorMode(): boolean {
-  const [isEvaluator, setIsEvaluator] = useState(false)
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    setIsEvaluator(params.get('view') === 'evaluator')
-  }, [])
-  return isEvaluator
+  return useSyncExternalStore(
+    subscribeToEvaluatorMode,
+    () => new URLSearchParams(window.location.search).get('view') === 'evaluator',
+    () => false,
+  )
 }
 
 /* ── Skeleton card ────────────────────────────────────────────────────── */
