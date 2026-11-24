@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef , useSyncExternalStore } from 'react'
+import { useEffect, useState, useRef, useSyncExternalStore } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Todo } from '@/types/database.types'
 import { estimateBeneficiaries, deploymentEfficiency } from '@/types/database.types'
@@ -113,7 +113,7 @@ import TaskCard from '@/components/TaskCard'
 import AgentLogPanel from '@/components/AgentLogPanel'
 import LiveSidebar from '@/components/LiveSidebar'
 import DashboardFooter from '@/components/DashboardFooter'
-import { Globe2, CheckCircle2, Clock, Zap, Users, Map } from 'lucide-react'
+import { Globe2, CheckCircle2, Clock, Users, Map } from 'lucide-react'
 
 /* ── Evaluator mode hook (reads ?view=evaluator without Suspense) ─────── */
 function subscribeToEvaluatorMode(onChange: () => void): () => void {
@@ -281,9 +281,11 @@ export default function Dashboard() {
       toast.error('Failed to update intervention status')
     },
     onSuccess: (_, { newStatus }) => {
-      newStatus === 'completed'
-        ? toast.success('✅ Intervention deployed', { description: 'Marked as complete.' })
-        : toast('🔄 Intervention re-opened', { description: 'Moved back to active operations.' })
+      if (newStatus === 'completed') {
+        toast.success('✅ Intervention deployed', { description: 'Marked as complete.' })
+      } else {
+        toast('🔄 Intervention re-opened', { description: 'Moved back to active operations.' })
+      }
     },
   })
 
