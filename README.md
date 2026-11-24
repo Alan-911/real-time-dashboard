@@ -4,11 +4,11 @@
 
 [Live demonstration](https://real-time-dashboard-blush.vercel.app/) · [Application code](src/app/DashboardClient.tsx) · [Reporting](src/lib/reportService.ts)
 
-## Project preview
+## Operations dashboard design preview
 
-![Realtime field operations architecture illustration](docs/images/project-overview.svg)
+![Operations Command Hub — real-time location map, performance analytics, and job allocation table](https://d2ol7oe51mr4n9.cloudfront.net/user_3BjvznL67PSnqP9w6BCX0wqGk5P/89328544-264e-4a2d-830f-e91d9825c0d6.png)
 
-*Illustrative architecture overview, not a capture of the deployed dashboard. [Open the live demo](https://real-time-dashboard-blush.vercel.app/) to view the actual interface.*
+*Design reference supplied for this project, showing a proposed location map, performance analytics, and job-allocation interface. This is **not a verified screenshot of the deployed application**; the current implementation focuses on task tracking, Supabase Realtime updates, execution logs, and PDF reporting. [View the live implementation](https://real-time-dashboard-blush.vercel.app/).*
 
 ## Overview
 
