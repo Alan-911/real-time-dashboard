@@ -1,177 +1,99 @@
-# Real-Time Operations Dashboard
+# Real-Time Field Operations Command Center
 
-**[🚀 Live Demo →](https://real-time-dashboard-blush.vercel.app)**
+**Next.js 16 · React 19 · TypeScript · Supabase Realtime · React Query**
 
-[![Live Demo](https://img.shields.io/badge/Demo-Live-22c55e.svg)](https://real-time-dashboard-blush.vercel.app)
+[Live demonstration](https://real-time-dashboard-blush.vercel.app/) · [Application code](src/app/DashboardClient.tsx) · [Reporting](src/lib/reportService.ts)
 
-> A live task board where database changes appear on screen instantly — no polling, no refresh. Built with Next.js 16, Supabase Realtime, and TypeScript.
+## Overview
 
-[![Next.js](https://img.shields.io/badge/Next.js-16-black.svg)](https://nextjs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://typescriptlang.org)
-[![Supabase](https://img.shields.io/badge/Supabase-Realtime-3ecf8e.svg)](https://supabase.com)
-[![Tailwind](https://img.shields.io/badge/Tailwind-4.x-38bdf8.svg)](https://tailwindcss.com)
+A full-stack dashboard prototype for managing and monitoring **field operations and assigned interventions**. It displays task priorities, assigned agents, status changes, execution logs and operational summaries.
 
----
+Unlike a polling-based dashboard, the application subscribes to Supabase PostgreSQL change events and updates connected views when records are inserted, changed or deleted. The interface also supports optimistic status changes with rollback on API errors.
 
-## What It Does
+**Important:** This is an **operations demonstration**. The initial field missions and log entries are synthetic examples; an “agent” assignment field does not mean an actual autonomous agent is executing a mission.
 
-An operations dashboard for tracking agent-assigned tasks in real time. When a task is created, updated, or completed — in the database, by any agent or user — every connected browser updates within milliseconds. No page refresh. No polling loop.
+## Features verified in the code
 
-Built as the monitoring frontend for a multi-agent system where tasks are assigned to named agents, carry priorities, and need live status visibility across a team.
+| Capability | Source | Notes |
+| --- | --- | --- |
+| PostgreSQL change subscriptions | [DashboardClient.tsx](src/app/DashboardClient.tsx) | Handles INSERT, UPDATE and DELETE via Supabase Realtime |
+| Optimistic updates and rollback | [DashboardClient.tsx](src/app/DashboardClient.tsx) | React Query mutation lifecycle |
+| Task assignment, filtering and priority | [TaskCard.tsx](src/components/TaskCard.tsx) | Interactive task presentation |
+| Execution log inspection | [AgentLogPanel.tsx](src/components/AgentLogPanel.tsx) | Displays stored task log entries |
+| Shift reports and PDF output | [reportService.ts](src/lib/reportService.ts), [pdfGenerator.ts](src/lib/pdfGenerator.ts) | Report-generation code |
+| Connection troubleshooting | [diagnose-supabase.mjs](scripts/diagnose-supabase.mjs) | Supabase configuration and diagnostic checks |
 
----
+## Architecture
 
-## How the Realtime Works
-
-Supabase exposes Postgres changes over a WebSocket channel. This app subscribes to `INSERT`, `UPDATE`, and `DELETE` events on the `todos` table and applies them directly to React state:
-
-```typescript
-// src/app/page.tsx
-const subscription = supabase
-  .channel('todos-changes')
-  .on(
-    'postgres_changes',
-    { event: '*', schema: 'public', table: 'todos' },
-    (payload) => {
-      if (payload.eventType === 'INSERT') {
-        setTodos((prev) => [payload.new as Todo, ...prev])
-      } else if (payload.eventType === 'UPDATE') {
-        setTodos((prev) =>
-          prev.map((todo) => todo.id === payload.new.id ? payload.new as Todo : todo)
-        )
-      } else if (payload.eventType === 'DELETE') {
-        setTodos((prev) => prev.filter((todo) => todo.id !== payload.old.id))
-      }
-    }
-  )
-  .subscribe()
+```text
+Supabase PostgreSQL — todos table
+              │
+       Supabase Realtime
+              │ INSERT / UPDATE / DELETE
+              ▼
+     Next.js client application
+              │
+    React Query cache + optimistic UI
+              │
+    Operations board / log panels
+              │
+       Shift report → PDF
 ```
 
-**Why this matters:** `postgres_changes` fires on every committed transaction — not on a timer. Latency is bounded by the Postgres commit → Supabase Realtime propagation path, typically **under 50ms** on a local or regional deployment.
+[Application entry point](src/app/page.tsx) renders `DashboardClient.tsx`, where the current real-time subscription and state management live.
 
----
-
-## Optimistic UI Updates
-
-When a user clicks the status toggle, the UI updates immediately — before the database confirms the write. If the write fails, state rolls back automatically:
-
-```typescript
-const toggleStatus = async (id: string, currentStatus: string) => {
-  const newStatus = currentStatus === 'completed' ? 'pending' : 'completed'
-
-  // 1. Update local state instantly (optimistic)
-  setTodos((prev) => prev.map((t) => t.id === id ? { ...t, status: newStatus } : t))
-
-  // 2. Persist to Supabase
-  const { error } = await supabase
-    .from('todos')
-    .update({ status: newStatus, updated_at: new Date().toISOString() })
-    .eq('id', id)
-
-  // 3. Roll back if write failed
-  if (error) fetchTodos()
-}
-```
-
-This gives the UI instant feel while keeping the database as source of truth.
-
----
-
-## Data Model
-
-```typescript
-// src/types/database.types.ts
-export type Todo = {
-  id: string
-  title: string
-  status: 'pending' | 'completed'
-  priority: 'low' | 'medium' | 'high'
-  assigned_agent: string | null   // which AI agent owns this task
-  updated_at: string
-}
-```
-
-Tasks are colored by priority (red = high, amber = medium, green = low) and show the assigned agent name and relative timestamp (e.g. "3 minutes ago").
-
----
-
-## UI Details
-
-Each task card renders:
-- **Status indicator bar** (top of card) — green when completed, gray when pending
-- **Priority badge** — color-coded with `AlertTriangle` icon
-- **Assigned agent chip** — which agent is responsible
-- **Relative timestamp** — `formatDistanceToNow` from `date-fns`
-- **Toggle button** — `CheckCircle2` / `Circle` with instant optimistic update
-- **Hover animation** — subtle lift (`-translate-y-1`) on hover
-
-**Live indicator** in the header: animated ping dot + "SYSTEM ONLINE" badge that reflects the Supabase channel connection state.
-
----
-
-## Quick Start
+## Get started
 
 ```bash
-git clone https://github.com/Alan-911/real-time-dashboard
+git clone https://github.com/Alan-911/real-time-dashboard.git
 cd real-time-dashboard
 npm install
 ```
 
-**Configure Supabase:**
+Create `.env.local`:
 
-```bash
-# .env.local
+```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-public-anon-key
 ```
 
-**Create the table in Supabase SQL editor:**
+Create a Supabase table with fields matching [Todo](src/types/database.types.ts): `id` (UUID), `title`, `status`, `priority`, `assigned_agent`, `updated_at`, plus a `logs` JSONB array for the log panel.
 
-```sql
-create table todos (
-  id uuid primary key default gen_random_uuid(),
-  title text not null,
-  status text default 'pending' check (status in ('pending', 'completed')),
-  priority text default 'medium' check (priority in ('low', 'medium', 'high')),
-  assigned_agent text,
-  updated_at timestamptz default now()
-);
-
--- Enable realtime
-alter publication supabase_realtime add table todos;
-```
+Configure PostgreSQL Realtime replication on `todos` and establish appropriate Row Level Security policies **before** exposing a writable instance. Do not place a service-role secret in a public client environment variable.
 
 ```bash
 npm run dev
-# http://localhost:3000
-
-# Insert a task from another terminal to see live update:
-# (or use Supabase Table Editor)
+# open http://localhost:3000
 ```
 
----
+## Demonstration data and metrics
 
-## Repo Structure
+- If the database is empty, the client displays generated field-operation examples and attempts to seed them into Supabase.
+- Seeding may fail under restrictive RLS; in that case, the interface can still display local examples.
+- “Estimated beneficiaries” is calculated using fixed priority weights.
+- “Asset uptime” is a simulated indicator derived from task completion and logs, **not measured infrastructure availability**.
+- “Peak latency” in reports is an illustrative calculation, **not a measured end-to-end response time**.
 
-```
-├── src/
-│   ├── app/
-│   │   ├── page.tsx          # Main dashboard — realtime subscription + task cards
-│   │   ├── layout.tsx        # Root layout + global font
-│   │   └── globals.css       # CSS variables: --background, --card, --accent, etc.
-│   ├── lib/
-│   │   └── supabase.ts       # Supabase client (env-configured)
-│   └── types/
-│       └── database.types.ts # Todo type definition
-├── next.config.ts
-├── tailwind.config.ts
-└── package.json
-```
+The realtime transport is implemented, but **no independently measured sub-50 ms propagation benchmark** is included. Do not describe that number as a verified performance result.
 
-## Stack
+## Current limitations
 
-`Next.js 16` · `React 19` · `TypeScript 5` · `Supabase Realtime` · `Tailwind CSS 4` · `Lucide React` · `date-fns`
+- No dedicated automated test suite or GitHub Actions CI workflow is present in this repository.
+- Authentication, authorization and user-specific Row Level Security need to be configured and documented for real operational use.
+- Demo seeding should be explicitly separated from real data.
+- Supabase subscriptions need more explicit connection-state and reconnection reporting.
+- The current app demonstrates human/agent-assigned tasks, not independent agent execution.
 
----
+## Engineering priorities
 
-Built by [Yves Alain Iragena](https://alan-911.github.io/my-portfolio) · MAIL Lab, Catholic University of America · iragena@cua.edu
+1. Implement a safe demo-mode switch instead of inserting demonstration records into an empty live database.
+2. Document a reproducible database migration and RLS access policies.
+3. Add automated tests for mutations, subscriptions and report calculations.
+4. Add CI and measurable latency instrumentation.
+5. Replace simulated operational KPIs with measured data when a real source is available.
+
+## Project status
+
+**Working full-stack operations prototype** with database-backed realtime updates. Not a deployed emergency-response system or a verified high-availability production service.
+
+**Maintainer:** Yves Alain Iragena · [Portfolio](https://alan-911.github.io/my-portfolio/)
