@@ -82,7 +82,6 @@ if (!realtimeOk) {
 
 // ── 3. Insert + delete a test row ────────────────────────────────────
 console.log('─── STEP 3: Insert test row ───')
-const testId = `diag-${Date.now()}`
 const { data: inserted, error: insertErr } = await supabase
   .from('todos')
   .insert({
