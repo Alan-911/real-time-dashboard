@@ -112,4 +112,5 @@ The realtime transport is implemented, but **no independently measured sub-50 ms
 - [Continuous integration](.github/workflows/ci.yml), [CodeQL and secret scanning](.github/workflows/security.yml).
 - [Security reporting policy](SECURITY.md) and [contribution guidelines](CONTRIBUTING.md).
 - Automated checks cannot replace Supabase RLS policies, authentication and deployment review; see [Supabase access-control checklist](docs/security/supabase-access.md).
+- **Unresolved dependency advisories:** The latest lockfile audit reported high/critical findings; see the [dated audit evidence and remediation plan](docs/security/dependency-audit.md). The dependency audit job intentionally fails until these are addressed.
 - Licensing for reuse should be confirmed with the project owner; no new license is granted by these workflow updates.
